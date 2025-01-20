@@ -1,7 +1,7 @@
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
 
-use std::collections::HashMap;
+use crate::headers::parse_headers;
 
 pub fn handle_client(mut stream: TcpStream) {
     let mut reader = BufReader::new(&stream);
@@ -31,21 +31,8 @@ pub fn handle_client(mut stream: TcpStream) {
         return;
     }
 
-    // Read and parse headers
-    let mut headers = HashMap::new();
-    let mut line = String::new();
-
-    while let Ok(bytes_read) = reader.read_line(&mut line) {
-        if bytes_read == 0 || line == "\r\n" {
-            break; // End of headers
-        }
-
-        if let Some((key, value)) = line.trim().split_once(": ") {
-            headers.insert(key.to_string(), value.to_string());
-        }
-
-        line.clear();
-    }
+    // Parse headers using the new function
+    let headers = parse_headers(&mut reader);
 
     // Log parsed request
     println!("Method: {}, Path: {}, Version: {}", method, path, version);
