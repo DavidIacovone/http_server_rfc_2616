@@ -1,11 +1,22 @@
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
-
+use std::sync::{Arc, Mutex};
 use crate::headers::parse_headers;
 use crate::helpers::build_response;
 use crate::url::parse_query_params;
+use crate::rate_limiter::RateLimiter;
 
-pub fn handle_client(mut stream: TcpStream) {
+pub fn handle_client(mut stream: TcpStream, ip: String, rate_limiter: Arc<Mutex<RateLimiter>>) {
+
+    let mut rate_limiter = rate_limiter.lock().unwrap();
+
+    // Check if the client is rate-limited
+    if rate_limiter.is_rate_limited(&ip) {
+        let response = build_response("429 Too Many Requests", "You have exceeded the rate limit. Please try again later.", false);
+        stream.write_all(response.as_bytes()).unwrap();
+        return;
+    }
+
     loop {
         let mut reader = BufReader::new(&stream);
         let mut request_line = String::new();

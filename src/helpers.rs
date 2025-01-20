@@ -12,7 +12,7 @@ pub fn build_response(status_code: &str, body: &str, keep_alive: bool) -> String
         "HTTP/1.1 {}\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n{}\r\n\r\n{}",
         status_code,
         body.len(),
-        connection_header,  // Ensure this is added
+        connection_header,
         body
     )
 }
