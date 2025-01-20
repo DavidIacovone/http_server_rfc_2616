@@ -6,6 +6,17 @@ use crate::helpers::build_response;
 use crate::url::parse_query_params;
 use crate::rate_limiter::RateLimiter;
 
+/// Handles an incoming client connection.
+///
+/// This function reads the request, checks for rate limiting, parses the request,
+/// and sends an appropriate response back to the client. It supports HTTP/1.1
+/// and handles different HTTP methods (GET, POST, PUT, DELETE).
+///
+/// # Arguments
+///
+/// * `stream` - The TCP stream for the client connection.
+/// * `ip` - The IP address of the client.
+/// * `rate_limiter` - A shared rate limiter to control the rate of incoming requests.
 pub fn handle_client(mut stream: TcpStream, ip: String, rate_limiter: Arc<Mutex<RateLimiter>>) {
 
     let mut rate_limiter = rate_limiter.lock().unwrap();
@@ -84,7 +95,7 @@ pub fn handle_client(mut stream: TcpStream, ip: String, rate_limiter: Arc<Mutex<
             }
         };
 
-        // Build and send the response
+        // Choose status code based on the method
         let status_code = match method {
             "GET" => "200 OK",
             "POST" => "201 Created",
