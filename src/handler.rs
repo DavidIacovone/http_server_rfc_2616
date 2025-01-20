@@ -50,13 +50,52 @@ pub fn handle_client(mut stream: TcpStream) {
     println!("Headers: {:?}", headers);
     println!("Query Params: {:?}", query_params);
 
-    // Generate the response
-    let response_body = format!("Hello! You requested: {}", path);
-    let response = format!(
-        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
-        response_body.len(),
-        response_body
-    );
-
-    stream.write_all(response.as_bytes()).unwrap();
+    // Handle different HTTP methods
+    match method {
+        "GET" => {
+            // Handle GET request
+            let response_body = format!("GET request for: {}", path);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
+                response_body.len(),
+                response_body
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+        }
+        "POST" => {
+            // Handle POST request
+            let response_body = format!("POST request to: {}", path);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
+                response_body.len(),
+                response_body
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+        }
+        "PUT" => {
+            // Handle PUT request
+            let response_body = format!("PUT request for: {}", path);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
+                response_body.len(),
+                response_body
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+        }
+        "DELETE" => {
+            // Handle DELETE request
+            let response_body = format!("DELETE request for: {}", path);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
+                response_body.len(),
+                response_body
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+        }
+        _ => {
+            // Handle unsupported methods
+            let response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Length: 0\r\n\r\n";
+            stream.write_all(response.as_bytes()).unwrap();
+        }
+    }
 }
