@@ -1,6 +1,7 @@
 mod handler;
 mod headers;
 mod url;
+mod helpers;
 
 use std::net::TcpListener;
 use std::thread;
