@@ -2,6 +2,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
 
 use crate::headers::parse_headers;
+use crate::url::parse_query_params;
 
 pub fn handle_client(mut stream: TcpStream) {
     let mut reader = BufReader::new(&stream);
@@ -34,11 +35,22 @@ pub fn handle_client(mut stream: TcpStream) {
     // Parse headers using the new function
     let headers = parse_headers(&mut reader);
 
+    // Extract query parameters from the path (if any)
+    let (path, query) = if let Some(query_str) = path.split_once('?') {
+        (query_str.0, Some(query_str.1))
+    } else {
+        (path, None)
+    };
+
+    // Parse query parameters if they exist
+    let query_params = query.map(|q| parse_query_params(q)).unwrap_or_default();
+
     // Log parsed request
     println!("Method: {}, Path: {}, Version: {}", method, path, version);
     println!("Headers: {:?}", headers);
+    println!("Query Params: {:?}", query_params);
 
-    // Basic response
+    // Generate the response
     let response_body = format!("Hello! You requested: {}", path);
     let response = format!(
         "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
